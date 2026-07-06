@@ -63,12 +63,16 @@ function sortWithin(profiles: Profile[], mode: SortMode, matchScores?: Map<strin
   }
 }
 
-/** Premium first (a paid benefit, PRD 7.8), the chosen sort within each tier. */
+/** Premium first (a paid benefit, PRD 7.8), the chosen sort within each tier.
+ *  Exception: Best Match sorts purely by score — PRD 7.7 specifies ranked
+ *  results ordered by match score, and letting the paid tier jump an AI
+ *  ranking would distort the feature it exists for. */
 export function sortProfiles(
   profiles: Profile[],
   mode: SortMode,
   matchScores?: Map<string, number>,
 ): Profile[] {
+  if (mode === 'best_match') return sortWithin(profiles, mode, matchScores)
   const premium = profiles.filter((p) => p.is_premium)
   const standard = profiles.filter((p) => !p.is_premium)
   return [...sortWithin(premium, mode, matchScores), ...sortWithin(standard, mode, matchScores)]

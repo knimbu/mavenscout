@@ -8,7 +8,8 @@ import {
   setOutreachTag,
   upsertNoteScore,
 } from '../../lib/openings'
-import type { CandidateNoteScore, HiringManager, OpeningEntry, Profile } from '../../types/db'
+import type { CandidateNoteScore, HiringManager, MatchSubScore, OpeningEntry, Profile } from '../../types/db'
+import { MatchBreakdown, MatchScoreBadge } from '../match/MatchBreakdown'
 
 // One candidate inside an opening (PRD 7.4): list-tag star (Top Pick ⊆
 // Favorite), independent outreach tag, attributed team notes + 0–5 scores
@@ -66,7 +67,7 @@ export function CandidateRow({
   currentAuthorId,
   canParticipate,
   onChanged,
-  matchScore,
+  match,
 }: {
   entry: OpeningEntry
   profile: Profile
@@ -78,8 +79,9 @@ export function CandidateRow({
   currentAuthorId: string | null
   canParticipate: boolean
   onChanged: () => void
-  /** AI match score for this candidate, when a ranking has been run (step 8) */
-  matchScore?: number | null
+  /** The opening's saved AI ranking result for this candidate, if any —
+   *  stays visible alongside the human scores, never merged (PRD 7.4/7.7). */
+  match?: { total_score: number; sub_scores: MatchSubScore[]; narrative: string | null } | null
 }) {
   const myNote = currentAuthorId ? notes.find((n) => n.author_id === currentAuthorId) : undefined
   const [noteDraft, setNoteDraft] = useState(myNote?.note ?? '')
@@ -116,11 +118,7 @@ export function CandidateRow({
           <p className="truncate text-xs text-ink-soft">{profile.headline}</p>
         </div>
         <div className="flex items-center gap-2">
-          {typeof matchScore === 'number' && (
-            <span className="rounded-full bg-ink px-2.5 py-1 text-xs font-bold text-white" title="AI match score">
-              {matchScore}
-            </span>
-          )}
+          {match && <MatchScoreBadge score={match.total_score} prominent={false} />}
           {average !== null && (
             <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
               Team {average}/5{rank && ` · #${rank}`}
@@ -169,6 +167,13 @@ export function CandidateRow({
           </button>
         </div>
       </div>
+
+      {/* AI match breakdown — complementary to the human scores below */}
+      {match && (
+        <div className="mt-2.5">
+          <MatchBreakdown subScores={match.sub_scores} narrative={match.narrative} />
+        </div>
+      )}
 
       {/* attributed team notes */}
       {otherNotes.length > 0 && (
