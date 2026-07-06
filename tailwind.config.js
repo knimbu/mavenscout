@@ -1,0 +1,46 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        // Brand cyan — logo dot + "Scout" wordmark half. Reserved for actions
+        // and emphasis, not spread everywhere (design brief).
+        brand: {
+          50: '#EBF7F9',
+          100: '#D2EDF1',
+          200: '#A6DBE3',
+          300: '#6FC2CF',
+          400: '#38A5B7',
+          500: '#0C8C9F',
+          600: '#0A7385',
+          700: '#095D6C',
+          800: '#0A4B57',
+          900: '#0B3E48',
+        },
+        // Warm-neutral surface + ink scale (editorial, not stark white).
+        paper: '#FAF8F5',
+        ink: {
+          DEFAULT: '#22333B',
+          soft: '#4A5B63',
+          faint: '#7C8B92',
+        },
+        line: '#E7E2DA',
+        // Premium "Featured" gold treatment (PRD 7.8).
+        gold: {
+          300: '#E5C878',
+          500: '#C9A227',
+          700: '#9A7B1C',
+        },
+      },
+      fontFamily: {
+        display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
+        sans: ['"Public Sans"', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        card: '0.875rem',
+      },
+    },
+  },
+  plugins: [],
+}

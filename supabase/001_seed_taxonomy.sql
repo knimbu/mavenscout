@@ -32,108 +32,108 @@ INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Gender Mainstreaming',1),('Gender-Based Violence',2),('Disability Inclusion',3),
           ('Indigenous Peoples',4),('Gender Budgeting',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Gender & Social Inclusion';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Gender & Social Inclusion';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Climate Adaptation',1),('Climate Mitigation',2),('Biodiversity',3),
           ('Renewable Energy',4),('Circular Economy',5),('Water Management',6),('WASH',7)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Climate & Environment';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Climate & Environment';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Anti-Corruption',1),('Public Procurement',2),('Justice Reform',3),
           ('Citizen Engagement',4),('Digital Governance',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Governance & Institutional';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Governance & Institutional';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Primary Education',1),('Tertiary Education',2),('Health Systems',3),
           ('Social Protection',4),('Nutrition',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Human Development';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Human Development';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Agribusiness',1),('Food Security',2),('Rural Development',3),
           ('Irrigation Systems',4),('Sustainable Farming',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Agriculture & Food';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Agriculture & Food';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Urban Transport',1),('Road Safety',2),('Logistics & Supply Chain',3),
           ('Energy Efficiency',4),('Public-Private Partnerships',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Infrastructure & Transport';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Infrastructure & Transport';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('SME Support',1),('Trade & Competitiveness',2),('Financial Inclusion',3),
           ('Investment Climate',4),('Innovation Ecosystems',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Private Sector Development';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Private Sector Development';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Peacebuilding',1),('Humanitarian Aid',2),('Refugee Support',3),
           ('Post-Conflict Reconstruction',4),('Social Cohesion',5)) AS v(name, sort_order)
-WHERE type = 'domain_expertise' AND name = 'Fragility, Conflict & Violence';
+WHERE taxonomy_categories.type = 'domain_expertise' AND taxonomy_categories.name = 'Fragility, Conflict & Violence';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Technical Writing',1),('Policy Briefs',2),('Ghostwriting',3),
           ('Copywriting',4),('Academic Editing',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Writing & Editorial';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Writing & Editorial';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Infographics',1),('Brand Identity',2),('Publication Layout',3),
           ('Motion Graphics',4),('Photography',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Graphic Design & Creative';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Graphic Design & Creative';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('GIS Mapping',1),('Data Science',2),('Statistical Analysis',3),
           ('Python/R',4),('Financial Modeling',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Technical & Data';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Technical & Data';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Project Management',1),('Monitoring & Evaluation',2),('Change Management',3),
           ('Stakeholder Facilitation',4)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Strategic & Operations';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Strategic & Operations';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Translation',1),('Interpretation',2),('Localization',3),
           ('Transcreation',4),('Subtitling',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Language & Translation';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Language & Translation';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Curriculum Design',1),('Workshop Facilitation',2),('E-Learning Development',3),
           ('Training of Trainers',4),('Mentoring',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Training & Capacity Building';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Training & Capacity Building';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Qualitative Research',1),('Survey Design',2),('Impact Evaluation',3),
           ('Market Research',4),('Policy Analysis',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Research & Analysis';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Research & Analysis';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Web Development',1),('Database Management',2),('Cybersecurity',3),
           ('Cloud Architecture',4),('Mobile App Development',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Digital & IT Services';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Digital & IT Services';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Media Relations',1),('Social Media',2),('Advocacy Campaigns',3),
           ('Speechwriting',4),('Public Outreach',5)) AS v(name, sort_order)
-WHERE type = 'technical_skills' AND name = 'Communications & Advocacy';
+WHERE taxonomy_categories.type = 'technical_skills' AND taxonomy_categories.name = 'Communications & Advocacy';
 
 INSERT INTO taxonomy_items (category_id, name, sort_order)
 SELECT id, v.name, v.sort_order FROM taxonomy_categories,
   (VALUES ('Remote',1),('On-site',2),('Hybrid',3)) AS v(name, sort_order)
-WHERE type = 'work_arrangement' AND name = 'Work Arrangement';
+WHERE taxonomy_categories.type = 'work_arrangement' AND taxonomy_categories.name = 'Work Arrangement';
 
 -- ============ VIDEO Q&A STANDARD QUESTIONS (Premium; see PRD 7.5) ============
 -- The general "Tell us about yourself" intro is NOT stored here (it's kind='intro'
