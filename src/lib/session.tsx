@@ -56,3 +56,23 @@ export function useSession(): SessionValue {
   if (!ctx) throw new Error('useSession must be used inside <SessionProvider>')
   return ctx
 }
+
+// ---------------------------------------------------------------------------
+// Which profile does the mocked consultant edit?
+// Default: the seeded demo consultant. A fresh signup creates a new pending
+// profile and pins its id here so onboarding continues on that draft.
+// ---------------------------------------------------------------------------
+
+const EDITOR_PROFILE_KEY = 'ms_editor_profile_id'
+
+export function getEditorProfileId(): string {
+  return localStorage.getItem(EDITOR_PROFILE_KEY) ?? DEMO_CONSULTANT_PROFILE_ID
+}
+
+export function setEditorProfileId(id: string) {
+  localStorage.setItem(EDITOR_PROFILE_KEY, id)
+}
+
+export function resetEditorProfile() {
+  localStorage.removeItem(EDITOR_PROFILE_KEY)
+}

@@ -1,19 +1,13 @@
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import lockup from '../../assets/mavenscout-lockup-horizontal.svg'
 import { useSession } from '../../lib/session'
+import { DevRoleSwitcher } from './DevRoleSwitcher'
+import { UserMenu } from './UserMenu'
 
 // Global navigation (PRD §6): logo, Browse, About, prominent "Join MavenScout"
-// CTA, Login when logged out. The logged-in user menu (role-appropriate items)
-// lands in step 4 with the mocked auth + role switcher — until then a simple
-// role chip shows which mocked identity is active.
-
-const ROLE_LABELS: Record<string, string> = {
-  hiring_manager: 'Demo Hiring Manager',
-  consultant: 'Demo Consultant',
-  admin: 'Demo Admin',
-}
+// CTA; Login when logged out, role-appropriate user menu when logged in (7.9b).
 
 function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   const linkCls = ({ isActive }: { isActive: boolean }) =>
@@ -31,9 +25,10 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function AppLayout() {
-  const { role, isLoggedIn } = useSession()
+  const { role, isLoggedIn, setRole } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -47,9 +42,7 @@ export function AppLayout() {
           <nav className="hidden items-center gap-6 text-sm md:flex">
             <NavItems />
             {isLoggedIn ? (
-              <span className="rounded-full bg-ink/5 px-3 py-1 text-xs font-medium text-ink-soft">
-                {ROLE_LABELS[role]}
-              </span>
+              <UserMenu />
             ) : (
               <Link to="/login" className="font-medium text-ink-soft hover:text-ink">
                 Login
@@ -74,10 +67,43 @@ export function AppLayout() {
         </div>
 
         {menuOpen && (
-          <nav className="flex flex-col gap-4 border-t border-line bg-white px-5 py-4 text-sm md:hidden">
+          <nav className="flex flex-col gap-3.5 border-t border-line bg-white px-5 py-4 text-sm md:hidden">
             <NavItems onNavigate={() => setMenuOpen(false)} />
             {isLoggedIn ? (
-              <span className="text-xs font-medium text-ink-faint">{ROLE_LABELS[role]}</span>
+              <>
+                {(role === 'consultant'
+                  ? [
+                      ['/onboarding', 'My Profile'],
+                      ['/account', 'Account Settings'],
+                      ['/billing', 'Billing'],
+                    ]
+                  : role === 'hiring_manager'
+                    ? [
+                        ['/openings', 'My Openings'],
+                        ['/account', 'Account Settings'],
+                      ]
+                    : [['/admin', 'Admin panel']]
+                ).map(([to, label]) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="font-medium text-ink-soft"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
+                <button
+                  className="text-left font-medium text-ink-soft"
+                  onClick={() => {
+                    setRole('logged_out')
+                    setMenuOpen(false)
+                    navigate('/')
+                  }}
+                >
+                  Log out
+                </button>
+              </>
             ) : (
               <Link
                 to="/login"
@@ -108,6 +134,9 @@ export function AppLayout() {
           development expertise.
         </p>
       </footer>
+
+      {/* Dev-only — see DevRoleSwitcher.tsx for the removal note. */}
+      <DevRoleSwitcher />
     </div>
   )
 }
