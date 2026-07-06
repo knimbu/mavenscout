@@ -44,6 +44,67 @@ export function audioPublicUrl(audioPath: string): string {
   return supabase.storage.from('audio-testimonials').getPublicUrl(audioPath).data.publicUrl
 }
 
+// ---- upload machinery (PRD 7.5/7.6) ----------------------------------------
+
+export const VIDEO_MAX_SECONDS = 120 // hard 2-minute cap on every video
+export const AUDIO_MAX_SECONDS = 120 // 2-minute cap on testimonials
+export const ASYNC_VIDEO_MAX_SECONDS = 300 // 5-minute cap (7.17 requests)
+
+/** Reads a media file's duration in the browser (client-side cap check —
+ *  PRD 7.5/7.6). Rejects if the browser can't parse the file at all. */
+export function getMediaDuration(file: File, kind: 'video' | 'audio'): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement(kind)
+    const url = URL.createObjectURL(file)
+    el.preload = 'metadata'
+    el.onloadedmetadata = () => {
+      URL.revokeObjectURL(url)
+      resolve(el.duration)
+    }
+    el.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error(`That file doesn't look like a playable ${kind} file.`))
+    }
+    el.src = url
+  })
+}
+
+/** Duration-checks then uploads a video file to the 'videos' bucket.
+ *  Returns {path, duration}. Throws a user-facing message on rejection. */
+export async function uploadVideoFile(
+  profileId: string,
+  file: File,
+  maxSeconds: number = VIDEO_MAX_SECONDS,
+): Promise<{ path: string; duration: number }> {
+  const duration = await getMediaDuration(file, 'video')
+  if (duration > maxSeconds)
+    throw new Error(
+      `Videos are capped at ${maxSeconds / 60} minutes — this one is ${Math.round(duration)}s.`,
+    )
+  const ext = file.name.split('.').pop() || 'mp4'
+  const path = `${profileId}/${crypto.randomUUID()}.${ext}`
+  const { error } = await supabase.storage.from('videos').upload(path, file)
+  if (error) throw new Error(`Upload failed: ${error.message}`)
+  return { path, duration: Math.round(duration) }
+}
+
+/** Duration-checks then uploads testimonial audio to its bucket. */
+export async function uploadAudioFile(
+  profileId: string,
+  file: File,
+): Promise<{ path: string; duration: number }> {
+  const duration = await getMediaDuration(file, 'audio')
+  if (duration > AUDIO_MAX_SECONDS)
+    throw new Error(
+      `Audio testimonials are capped at 2 minutes — this one is ${Math.round(duration)}s.`,
+    )
+  const ext = file.name.split('.').pop() || 'mp3'
+  const path = `${profileId}/${crypto.randomUUID()}.${ext}`
+  const { error } = await supabase.storage.from('audio-testimonials').upload(path, file)
+  if (error) throw new Error(`Upload failed: ${error.message}`)
+  return { path, duration: Math.round(duration) }
+}
+
 // ---- résumés (PDF upload-or-URL, same pattern as videos) -------------------
 
 const RESUME_MAX_BYTES = 10 * 1024 * 1024 // 10 MB

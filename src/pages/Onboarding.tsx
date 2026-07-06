@@ -9,7 +9,9 @@ import { PortfolioEditor } from '../components/onboarding/PortfolioEditor'
 import { ResumeUploader } from '../components/onboarding/ResumeUploader'
 import { SocialLinksEditor } from '../components/onboarding/SocialLinksEditor'
 import { TagPicker } from '../components/onboarding/TagPicker'
+import { TestimonialsSection } from '../components/onboarding/TestimonialsSection'
 import { TierSection } from '../components/onboarding/TierSection'
+import { VideoQnASection } from '../components/onboarding/VideoQnASection'
 import { InfoTip } from '../components/ui/InfoTip'
 import { FIRM_THRESHOLD_NOTE } from '../components/ui/badges'
 import { useEditorProfile } from '../hooks/useEditorProfile'
@@ -24,12 +26,35 @@ import {
   portfolioCap,
   socialLinkCap,
 } from '../lib/validation'
-import type { Profile, TaxonomyCategory, TaxonomyItem } from '../types/db'
+import type { PortfolioItem, Profile, TaxonomyCategory, TaxonomyItem } from '../types/db'
 
 // The consultant/firm profile editor (PRD 7.3) — one page, sections saving
 // independently, doubling as onboarding (new pending draft) and post-approval
 // editing (edits auto-publish, v1 rule). Media sections (Video Q&As, audio
 // testimonials) land in build step 6 and slot in as further sections here.
+
+/** Fetches the portfolio list once for both media editors (video attach +
+ *  testimonial attach pickers). */
+function MediaSections({ profileId, draft }: { profileId: string; draft: Profile }) {
+  const [portfolio, setPortfolio] = useState<PortfolioItem[] | null>(null)
+  useEffect(() => {
+    supabase
+      .from('portfolio_items')
+      .select('*')
+      .eq('profile_id', profileId)
+      .order('sort_order')
+      .then(({ data }) => setPortfolio((data as PortfolioItem[]) ?? []))
+  }, [profileId])
+  if (!portfolio) return <p className="text-sm text-ink-faint">Loading…</p>
+  return (
+    <>
+      <VideoQnASection profile={draft} portfolio={portfolio} />
+      <div className="border-t border-line pt-6">
+        <TestimonialsSection profile={draft} portfolio={portfolio} />
+      </div>
+    </>
+  )
+}
 
 const SECTIONS = [
   ['basics', 'Basics'],
@@ -443,13 +468,11 @@ export default function Onboarding() {
           <EditorSection
             id="media"
             title="Video Q&As & audio testimonials"
-            description="Real uploads (2-minute cap) with a paste-a-URL alternative for video."
+            description="Real uploads (2-minute cap enforced before saving) with a paste-a-URL alternative for video. In-browser recording is a later fast-follow."
           >
-            <p className="rounded-lg bg-paper px-3.5 py-3 text-sm text-ink-faint">
-              These sections arrive in build step 6: the general intro video (all tiers), the 5
-              Premium standard-question videos, portfolio-attached video, and both audio
-              testimonial paths (tokenised reference link + direct upload).
-            </p>
+            <div className="space-y-8">
+              <MediaSections profileId={draft.id} draft={draft} />
+            </div>
           </EditorSection>
 
           <EditorSection id="tier" title="Tier & review">
