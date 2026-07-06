@@ -76,6 +76,8 @@ export interface Profile {
   availability_updated_at: string | null
   photo_url: string | null
   cover_image_url: string | null
+  resume_path: string | null // Storage path in 'resumes' bucket (PDF upload)
+  resume_url: string | null // OR external link — exactly one populated, app-enforced
   detailed_bio: string | null
   expertise: TagSelection[]
   skills: TagSelection[]

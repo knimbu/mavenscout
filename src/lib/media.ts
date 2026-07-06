@@ -43,3 +43,55 @@ export function resolveVideo(video: VideoResponse): PlayableVideo | null {
 export function audioPublicUrl(audioPath: string): string {
   return supabase.storage.from('audio-testimonials').getPublicUrl(audioPath).data.publicUrl
 }
+
+// ---- résumés (PDF upload-or-URL, same pattern as videos) -------------------
+
+const RESUME_MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+
+export function resumeDownloadUrl(profile: {
+  resume_path: string | null
+  resume_url: string | null
+}): string | null {
+  if (profile.resume_path)
+    return supabase.storage.from('resumes').getPublicUrl(profile.resume_path).data.publicUrl
+  return profile.resume_url
+}
+
+/** Uploads a résumé PDF to the 'resumes' bucket and points the profile at it
+ *  (clearing any external resume_url — exactly one of path/url is populated).
+ *  Returns the storage path. Throws with a user-facing message on rejection. */
+export async function uploadResume(profileId: string, file: File): Promise<string> {
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))
+    throw new Error('Résumés must be PDF files.')
+  if (file.size > RESUME_MAX_BYTES) throw new Error('Résumé PDFs are capped at 10 MB.')
+
+  const path = `${profileId}/resume.pdf`
+  const { error: upErr } = await supabase.storage
+    .from('resumes')
+    .upload(path, file, { upsert: true, contentType: 'application/pdf' })
+  if (upErr) throw new Error(`Upload failed: ${upErr.message}`)
+
+  const { error: dbErr } = await supabase
+    .from('profiles')
+    .update({ resume_path: path, resume_url: null })
+    .eq('id', profileId)
+  if (dbErr) throw new Error(`Couldn't save to profile: ${dbErr.message}`)
+  return path
+}
+
+/** Points the profile at an external résumé link instead (clears any upload). */
+export async function setResumeUrl(profileId: string, url: string): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ resume_url: url, resume_path: null })
+    .eq('id', profileId)
+  if (error) throw new Error(`Couldn't save to profile: ${error.message}`)
+}
+
+export async function removeResume(profileId: string): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ resume_path: null, resume_url: null })
+    .eq('id', profileId)
+  if (error) throw new Error(`Couldn't save to profile: ${error.message}`)
+}

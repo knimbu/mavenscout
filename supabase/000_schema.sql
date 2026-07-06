@@ -82,6 +82,8 @@ CREATE TABLE profiles (
   availability_updated_at       timestamptz,
   photo_url                     text,
   cover_image_url               text,
+  resume_path                   text,                         -- Supabase Storage path in the 'resumes' bucket (PDF upload)
+  resume_url                    text,                         -- OR an external link — exactly one populated, app-enforced (same pattern as video_responses)
   detailed_bio                  text,
   expertise                     jsonb NOT NULL DEFAULT '[]',  -- [{name, tier: primary|secondary, level: category|item}], 2+4 cap app-enforced
   skills                        jsonb NOT NULL DEFAULT '[]',  -- same shape/caps as expertise
@@ -411,18 +413,23 @@ CREATE POLICY "dev_write_video_response_requests" ON video_response_requests FOR
 --   hardening pass must scope these (esp. the unauthenticated testimonial path:
 --   token validation, MIME/size caps, rate-limiting).
 -- ============================================================================
+-- 'resumes' holds candidate CV PDFs. Public-read in dev like the others;
+-- PROD: résumés are personal documents — the hardening pass should make this
+-- bucket private and serve downloads via short-lived signed URLs, scoped to
+-- logged-in hiring accounts.
 INSERT INTO storage.buckets (id, name, public) VALUES
   ('videos', 'videos', true),
-  ('audio-testimonials', 'audio-testimonials', true);
+  ('audio-testimonials', 'audio-testimonials', true),
+  ('resumes', 'resumes', true);
 
 CREATE POLICY "dev_storage_read"   ON storage.objects FOR SELECT
-  USING (bucket_id IN ('videos','audio-testimonials'));
+  USING (bucket_id IN ('videos','audio-testimonials','resumes'));
 CREATE POLICY "dev_storage_insert" ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id IN ('videos','audio-testimonials'));
+  WITH CHECK (bucket_id IN ('videos','audio-testimonials','resumes'));
 CREATE POLICY "dev_storage_update" ON storage.objects FOR UPDATE
-  USING (bucket_id IN ('videos','audio-testimonials'));
+  USING (bucket_id IN ('videos','audio-testimonials','resumes'));
 CREATE POLICY "dev_storage_delete" ON storage.objects FOR DELETE
-  USING (bucket_id IN ('videos','audio-testimonials'));
+  USING (bucket_id IN ('videos','audio-testimonials','resumes'));
 
 -- ============================================================================
 -- Table-level privileges — required in addition to the RLS policies above.
