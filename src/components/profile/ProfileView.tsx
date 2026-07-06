@@ -8,6 +8,7 @@ import { visibilityFor, type Surface } from '../../lib/visibility'
 import type { PortfolioItem, Profile } from '../../types/db'
 import { TestimonialCard } from '../media/AudioPlayer'
 import { VideoPlayer } from '../media/VideoPlayer'
+import { useSaveCandidate } from '../openings/SaveCandidateFlow'
 import {
   AvailabilityBadges,
   CAREER_LEVEL_LABELS,
@@ -17,7 +18,6 @@ import {
 } from '../ui/badges'
 import { Carousel } from '../ui/Carousel'
 import { GatePrompt } from '../ui/GatePrompt'
-import { SignupPrompt } from '../ui/SignupPrompt'
 import { TagPills } from '../ui/TagPills'
 import { ContactModal } from './ContactModal'
 
@@ -34,8 +34,7 @@ export function ProfileView({ data, surface }: { data: ProfileData; surface: Sur
 
   const [tab, setTab] = useState<TabId>('overview')
   const [contactOpen, setContactOpen] = useState(false)
-  const [gatedFeature, setGatedFeature] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
+  const { save, ui: saveUi } = useSaveCandidate()
 
   const isFirm = profile.consultant_type !== 'Individual'
   const intro = videos.find((v) => v.kind === 'intro') ?? null
@@ -54,11 +53,6 @@ export function ProfileView({ data, surface }: { data: ProfileData; surface: Sur
     }
     return t
   }, [isFirm, profile.additional_experience.length, rules.gatedTabsExist])
-
-  const onSave = (what: string) => {
-    if (rules.saveActions === 'gated') setGatedFeature(what)
-    else setNotice('Saving into openings arrives in build step 5.')
-  }
 
   return (
     <div>
@@ -88,13 +82,13 @@ export function ProfileView({ data, surface }: { data: ProfileData; surface: Sur
             {rules.saveActions !== 'hidden' && (
               <>
                 <button
-                  onClick={() => onSave('Saving candidates to a long list')}
+                  onClick={() => save(profile, 'favorite')}
                   className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-sm font-medium text-ink-soft hover:border-ink-faint"
                 >
                   <Bookmark size={15} /> Favorite
                 </button>
                 <button
-                  onClick={() => onSave('Marking Top Picks')}
+                  onClick={() => save(profile, 'top_pick')}
                   className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-1.5 text-sm font-medium text-ink-soft hover:border-ink-faint"
                 >
                   <Star size={15} /> Top Pick
@@ -193,22 +187,7 @@ export function ProfileView({ data, surface }: { data: ProfileData; surface: Sur
       </div>
 
       <ContactModal profile={profile} open={contactOpen} onClose={() => setContactOpen(false)} />
-      <SignupPrompt
-        open={gatedFeature !== null}
-        onClose={() => setGatedFeature(null)}
-        feature={gatedFeature ?? ''}
-      />
-      {notice && (
-        <div
-          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-sm text-white shadow-lg"
-          role="status"
-        >
-          {notice}
-          <button className="ml-3 text-white/60 hover:text-white" onClick={() => setNotice(null)}>
-            ✕
-          </button>
-        </div>
-      )}
+      {saveUi}
     </div>
   )
 }

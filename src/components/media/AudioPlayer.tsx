@@ -1,11 +1,12 @@
 import { ExternalLink } from 'lucide-react'
+import { fmtLongMonthYear } from '../../lib/dates'
 import { audioPublicUrl } from '../../lib/media'
 import type { AudioTestimonial } from '../../types/db'
 import { TranscriptDisclosure } from './VideoPlayer'
 
 function fmtRefDate(iso: string | null): string | null {
   if (!iso) return null
-  return new Date(iso).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+  return fmtLongMonthYear(iso)
 }
 
 /** One audio testimonial: player + the reference's identity details and

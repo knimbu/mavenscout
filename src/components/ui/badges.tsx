@@ -1,4 +1,5 @@
 import { BadgeCheck } from 'lucide-react'
+import { fmtMonthYear } from '../../lib/dates'
 import type { AvailabilityTrack, CareerLevel, Profile } from '../../types/db'
 import { InfoTip } from './InfoTip'
 
@@ -42,9 +43,7 @@ export function FeaturedRibbon() {
   )
 }
 
-function fmtMonth(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
-}
+const fmtMonth = fmtMonthYear
 
 function trackBadge(track: AvailabilityTrack, label: 'PT' | 'FT') {
   // Color code (PRD 7.16): green = now, amber = future/window, grey = unavailable.

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { FilterBar } from '../components/directory/FilterBar'
 import { FlipCard } from '../components/directory/FlipCard'
 import { SortDropdown } from '../components/directory/SortDropdown'
+import { useSaveCandidate } from '../components/openings/SaveCandidateFlow'
 import { SignupPrompt } from '../components/ui/SignupPrompt'
 import { useDirectoryData } from '../hooks/useDirectoryData'
 import {
@@ -25,6 +26,7 @@ export default function Directory() {
   const [epoch, setEpoch] = useState(0)
   const [gatedFeature, setGatedFeature] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const { save, ui: saveUi } = useSaveCandidate()
 
   const handleFilterChange = (next: FilterState) => {
     setFilters(next)
@@ -117,16 +119,8 @@ export default function Directory() {
               portfolio={data.portfolioByProfile.get(p.id) ?? []}
               intro={data.introByProfile.get(p.id) ?? null}
               audioCount={data.audioCountByProfile.get(p.id) ?? 0}
-              onFavorite={() =>
-                requireAccount('Saving candidates', () =>
-                  setNotice('Saving into openings arrives in build step 5.'),
-                )
-              }
-              onTopPick={() =>
-                requireAccount('Saving candidates', () =>
-                  setNotice('Saving into openings arrives in build step 5.'),
-                )
-              }
+              onFavorite={(p) => save(p, 'favorite')}
+              onTopPick={(p) => save(p, 'top_pick')}
             />
           ))}
       </div>
@@ -142,6 +136,7 @@ export default function Directory() {
         onClose={() => setGatedFeature(null)}
         feature={gatedFeature ?? ''}
       />
+      {saveUi}
 
       {notice && (
         <div
