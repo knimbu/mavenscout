@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import mark from '../assets/mavenscout-mark.svg'
 import { ProfileView } from '../components/profile/ProfileView'
+import { ProfileSkeleton } from '../components/ui/Skeletons'
 import { useProfile } from '../hooks/useProfile'
 
 /** /site/:handle — the same profile rendered as a standalone personal
@@ -24,12 +25,7 @@ export default function SitePage() {
         <p className="text-red-600">Couldn't load this site: {error}</p>
       </div>
     )
-  if (!data)
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-ink-faint">Loading…</p>
-      </div>
-    )
+  if (!data) return <ProfileSkeleton />
 
   return (
     <div className="flex min-h-screen flex-col">

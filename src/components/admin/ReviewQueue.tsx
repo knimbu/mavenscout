@@ -1,4 +1,4 @@
-import { Check, ShieldCheck, X } from 'lucide-react'
+import { Check, Inbox, ShieldCheck, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
@@ -64,7 +64,15 @@ export function ReviewQueue() {
 
   if (!pending) return <p className="text-sm text-ink-faint">Loading…</p>
   if (pending.length === 0)
-    return <p className="text-sm text-ink-faint">Queue is empty — nothing awaiting review.</p>
+    return (
+      <div className="flex flex-col items-center rounded-card border border-dashed border-line py-14 text-center">
+        <Inbox size={24} className="text-ink-faint/60" />
+        <p className="mt-3 text-sm font-medium text-ink-soft">All clear</p>
+        <p className="mt-0.5 text-xs text-ink-faint">
+          New profile submissions and Premium applications land here for review.
+        </p>
+      </div>
+    )
 
   return (
     <div className="space-y-4">

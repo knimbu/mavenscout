@@ -2,6 +2,7 @@ import { Bookmark, CalendarDays, Plus, Trash2, Users } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Modal } from '../components/ui/Modal'
+import { RowsSkeleton } from '../components/ui/Skeletons'
 import { useOpeningsList } from '../hooks/useOpeningData'
 import { fmtDate } from '../lib/dates'
 import { clearOpening, createOpening, deleteOpening } from '../lib/openings'
@@ -49,7 +50,7 @@ export default function Openings() {
       </div>
 
       <div className="mt-6 space-y-3">
-        {openings === null && <p className="text-ink-faint">Loading…</p>}
+        {openings === null && <RowsSkeleton rows={3} />}
         {openings?.map((o) => (
           <div key={o.id} className="flex flex-wrap items-center gap-3 rounded-card border border-line bg-white p-4">
             <span className={`rounded-full p-2 ${o.is_default ? 'bg-ink/5 text-ink-soft' : 'bg-brand-50 text-brand-600'}`}>

@@ -117,7 +117,7 @@ export function CandidateRow({
           </Link>
           <p className="truncate text-xs text-ink-soft">{profile.headline}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
           {match && <MatchScoreBadge score={match.total_score} prominent={false} />}
           {average !== null && (
             <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">

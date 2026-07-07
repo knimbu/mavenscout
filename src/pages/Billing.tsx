@@ -122,18 +122,19 @@ export default function Billing() {
         <p className="mt-2 rounded-lg bg-brand-50 px-3.5 py-2.5 text-sm text-ink-soft">{message}</p>
       )}
 
-      {/* Tier matrix */}
-      <div className="mt-8 overflow-x-auto rounded-card border border-line bg-white">
-        <table className="w-full min-w-[520px] text-sm">
+      {/* Tier matrix — feature labels wrap so the two tier columns stay
+          on-screen even at phone width (no horizontal scroll). */}
+      <div className="mt-8 rounded-card border border-line bg-white">
+        <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-line text-left">
-              <th className="px-4 py-3 font-semibold">Feature</th>
-              <th className={`px-4 py-3 text-center font-semibold ${!profile.is_premium ? 'text-brand-700' : ''}`}>
+              <th className="px-3 py-3 font-semibold sm:px-4">Feature</th>
+              <th className={`w-16 px-1 py-3 text-center font-semibold sm:w-24 sm:px-4 ${!profile.is_premium ? 'text-brand-700' : ''}`}>
                 Standard
               </th>
-              <th className={`px-4 py-3 text-center font-semibold ${profile.is_premium ? 'text-gold-700' : ''}`}>
+              <th className={`w-16 px-1 py-3 text-center font-semibold sm:w-24 sm:px-4 ${profile.is_premium ? 'text-gold-700' : ''}`}>
                 <span className="inline-flex items-center gap-1">
-                  <Sparkles size={13} className="text-gold-500" /> Premium
+                  <Sparkles size={13} className="hidden text-gold-500 sm:inline" /> Premium
                 </span>
               </th>
             </tr>
@@ -141,9 +142,9 @@ export default function Billing() {
           <tbody>
             {MATRIX.map((row) => (
               <tr key={row.label} className="border-b border-line/60 last:border-0">
-                <td className="px-4 py-2.5 text-ink-soft">{row.label}</td>
-                <td className="px-4 py-2.5 text-center"><Cell value={row.standard} /></td>
-                <td className="px-4 py-2.5 text-center"><Cell value={row.premium} /></td>
+                <td className="px-3 py-2.5 text-xs leading-snug text-ink-soft sm:px-4 sm:text-sm">{row.label}</td>
+                <td className="px-1 py-2.5 text-center text-xs sm:px-4 sm:text-sm"><Cell value={row.standard} /></td>
+                <td className="px-1 py-2.5 text-center text-xs sm:px-4 sm:text-sm"><Cell value={row.premium} /></td>
               </tr>
             ))}
           </tbody>

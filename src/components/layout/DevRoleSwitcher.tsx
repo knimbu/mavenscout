@@ -62,10 +62,12 @@ export function DevRoleSwitcher() {
         <button
           onClick={() => setOpen(true)}
           title="Dev role switcher (mocked auth)"
-          className="flex items-center gap-1.5 rounded-full bg-ink px-3 py-2 text-xs font-medium text-white shadow-lg hover:bg-ink/85"
+          aria-label={`Dev role switcher — viewing as ${ROLES.find((r) => r.value === role)?.label}`}
+          className="flex items-center gap-1.5 rounded-full bg-ink/85 p-2.5 text-xs font-medium text-white shadow-lg backdrop-blur hover:bg-ink sm:px-3 sm:py-2"
         >
           <FlaskConical size={13} className="text-gold-300" />
-          {ROLES.find((r) => r.value === role)?.label}
+          {/* icon-only at phone width so it doesn't sit on top of CTAs */}
+          <span className="hidden sm:inline">{ROLES.find((r) => r.value === role)?.label}</span>
         </button>
       )}
     </div>

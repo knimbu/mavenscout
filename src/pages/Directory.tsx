@@ -1,4 +1,4 @@
-import { Sparkles, X } from 'lucide-react'
+import { SearchX, Sparkles, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { FilterBar } from '../components/directory/FilterBar'
 import { FlipCard } from '../components/directory/FlipCard'
@@ -8,6 +8,7 @@ import { RankByJDModal } from '../components/match/RankByJDModal'
 import { SaveRankingModal } from '../components/match/SaveRankingModal'
 import { useSaveCandidate } from '../components/openings/SaveCandidateFlow'
 import { SignupPrompt } from '../components/ui/SignupPrompt'
+import { DirectorySkeleton } from '../components/ui/Skeletons'
 import { rankPool, type RankingRun } from '../lib/matching/run'
 import { useDirectoryData } from '../hooks/useDirectoryData'
 import {
@@ -172,6 +173,8 @@ export default function Directory() {
         <SortDropdown value={sort} onChange={setSort} bestMatchAvailable={ranking !== null} />
       </div>
 
+      {!data && <DirectorySkeleton />}
+
       <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {data &&
           results.map((p, index) => {
@@ -209,9 +212,20 @@ export default function Directory() {
       </div>
 
       {data && results.length === 0 && (
-        <p className="py-16 text-center text-ink-faint">
-          No consultants match the current filters.
-        </p>
+        <div className="flex flex-col items-center py-16 text-center">
+          <SearchX size={26} className="text-ink-faint/60" />
+          <p className="mt-3 font-medium text-ink-soft">No consultants match these filters</p>
+          <p className="mt-1 max-w-sm text-sm text-ink-faint">
+            The pool is curated, not endless — try widening a category filter or switching the
+            search to full profiles.
+          </p>
+          <button
+            onClick={() => handleFilterChange(EMPTY_FILTERS)}
+            className="mt-4 rounded-full border border-line bg-white px-4 py-1.5 text-sm font-medium text-ink-soft hover:border-ink-faint"
+          >
+            Clear all filters
+          </button>
+        </div>
       )}
 
       <SignupPrompt

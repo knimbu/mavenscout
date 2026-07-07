@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { CandidateRow } from '../components/openings/CandidateRow'
 import { useOpeningDetail } from '../hooks/useOpeningData'
+import { RowsSkeleton } from '../components/ui/Skeletons'
 import { loadRankingForOpening, type SavedRanking } from '../lib/matching/run'
 import { computeTeamStats } from '../lib/openings'
 import { DEMO_HIRING_MANAGER_ID, useSession } from '../lib/session'
@@ -24,7 +25,12 @@ export default function SharedShortlist() {
   }, [data])
 
   if (notFound) return <NotFound />
-  if (!data) return <p className="mx-auto max-w-5xl px-4 py-16 text-ink-faint">Loading…</p>
+  if (!data)
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <RowsSkeleton rows={4} />
+      </div>
+    )
 
   const { opening, entries, profiles, notes, reviewers, managers } = data
   const stats = computeTeamStats(entries, notes)

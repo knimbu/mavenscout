@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { ProfileView } from '../components/profile/ProfileView'
+import { ProfileSkeleton } from '../components/ui/Skeletons'
 import { useProfile } from '../hooks/useProfile'
 import NotFound from './NotFound'
 
@@ -17,11 +18,6 @@ export default function ProfilePage() {
         <p className="text-red-600">Couldn't load this profile: {error}</p>
       </div>
     )
-  if (!data)
-    return (
-      <div className="mx-auto max-w-5xl px-4 py-16">
-        <p className="text-ink-faint">Loading…</p>
-      </div>
-    )
+  if (!data) return <ProfileSkeleton />
   return <ProfileView data={data} surface="platform" />
 }

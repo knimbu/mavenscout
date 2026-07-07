@@ -5,6 +5,7 @@ import { RankByJDModal } from '../components/match/RankByJDModal'
 import { CandidateRow } from '../components/openings/CandidateRow'
 import { ReviewersPanel, SharePanel } from '../components/openings/SharePanels'
 import { VideoRequestsPanel } from '../components/openings/VideoRequestsPanel'
+import { RowsSkeleton } from '../components/ui/Skeletons'
 import { useOpeningDetail } from '../hooks/useOpeningData'
 import { fmtDate } from '../lib/dates'
 import {
@@ -62,7 +63,12 @@ export default function OpeningDetail() {
         </p>
       </div>
     )
-  if (!data) return <p className="mx-auto max-w-5xl px-4 py-16 text-ink-faint">Loading…</p>
+  if (!data)
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <RowsSkeleton rows={4} />
+      </div>
+    )
 
   const { opening, entries, profiles, notes, reviewers, shares, managers } = data
   const stats = computeTeamStats(entries, notes)
