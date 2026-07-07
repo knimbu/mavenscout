@@ -2,8 +2,9 @@ import { CheckCircle2, Mic, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import lockup from '../assets/mavenscout-lockup-horizontal.svg'
+import { RecorderControl } from '../components/media/Recorder'
 import { FieldRow, TextArea, TextField } from '../components/onboarding/fields'
-import { uploadAudioFile } from '../lib/media'
+import { AUDIO_MAX_SECONDS, uploadAudioFile } from '../lib/media'
 import { supabase } from '../lib/supabase'
 import type { AudioTestimonial, PortfolioItem, Profile } from '../types/db'
 
@@ -124,16 +125,18 @@ function SubmissionForm({
     transcript: '',
   })
   const [file, setFile] = useState<File | null>(null)
+  const [recordedDuration, setRecordedDuration] = useState<number | null>(null)
+  const [recording, setRecording] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const submit = async () => {
     if (!form.reference_name.trim()) return setError('Please enter your name.')
-    if (!file) return setError('Please attach your audio recording.')
+    if (!file) return setError('Please record or attach your audio.')
     setBusy(true)
     setError(null)
     try {
-      const up = await uploadAudioFile(candidate.id, file)
+      const up = await uploadAudioFile(candidate.id, file, recordedDuration ?? undefined)
       const { error: err } = await supabase
         .from('audio_testimonials')
         .update({
@@ -227,23 +230,49 @@ function SubmissionForm({
         />
 
         <div className="rounded-xl border border-dashed border-line p-4">
-          <input
-            ref={fileRef}
-            type="file"
-            accept="audio/*"
-            className="hidden"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-soft hover:border-brand-400"
-          >
-            <Upload size={15} /> {file ? file.name : 'Attach your audio recording (≤2 min)'}
-          </button>
-          <p className="mt-1.5 text-xs text-ink-faint">
-            Record with your phone's voice-memo app or any recorder, then attach the file.
-            (In-browser recording is coming later.)
-          </p>
+          {recording ? (
+            <RecorderControl
+              kind="audio"
+              maxSeconds={AUDIO_MAX_SECONDS}
+              onRecorded={(f, duration) => {
+                setFile(f)
+                setRecordedDuration(duration)
+                setRecording(false)
+              }}
+              onCancel={() => setRecording(false)}
+            />
+          ) : (
+            <>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={(e) => {
+                  setFile(e.target.files?.[0] ?? null)
+                  setRecordedDuration(null)
+                }}
+              />
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setRecording(true)}
+                  className="flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+                >
+                  <Mic size={15} /> Record right here (≤2 min)
+                </button>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink-soft hover:border-brand-400"
+                >
+                  <Upload size={15} /> {file ? file.name : 'Attach a recording'}
+                </button>
+              </div>
+              <p className="mt-1.5 text-xs text-ink-faint">
+                Record in the browser (stops automatically at 2 minutes), or attach a file from
+                your phone's voice-memo app.
+              </p>
+            </>
+          )}
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

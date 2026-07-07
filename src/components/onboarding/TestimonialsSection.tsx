@@ -1,6 +1,7 @@
 import { Copy, Link2, Mail, Mic, Trash2, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { audioPublicUrl, uploadAudioFile } from '../../lib/media'
+import { audioPublicUrl, AUDIO_MAX_SECONDS, uploadAudioFile } from '../../lib/media'
+import { RecorderControl } from '../media/Recorder'
 import { supabase } from '../../lib/supabase'
 import { audioTestimonialCap } from '../../lib/validation'
 import type { AudioTestimonial, PortfolioItem, Profile } from '../../types/db'
@@ -298,17 +299,19 @@ function DirectUpload({
     portfolio_item_id: '',
   })
   const [file, setFile] = useState<File | null>(null)
+  const [recordedDuration, setRecordedDuration] = useState<number | null>(null)
+  const [recording, setRecording] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
 
   const submit = async () => {
-    if (!file) return setError('Choose an audio file first.')
+    if (!file) return setError('Record or choose an audio file first.')
     if (!form.reference_name.trim()) return setError("Enter the reference's name.")
     setBusy(true)
     setError(null)
     try {
-      const up = await uploadAudioFile(profile.id, file)
+      const up = await uploadAudioFile(profile.id, file, recordedDuration ?? undefined)
       const { error: err } = await supabase.from('audio_testimonials').insert({
         profile_id: profile.id,
         portfolio_item_id: form.portfolio_item_id || null,
@@ -391,28 +394,50 @@ function DirectUpload({
           </select>
         </label>
         <TextArea label="Transcript (optional)" rows={2} value={form.transcript} onChange={(v) => setForm({ ...form, transcript: v })} />
-        <div className="flex flex-wrap items-center gap-2.5">
-          <input
-            ref={fileRef}
-            type="file"
-            accept="audio/*"
-            className="hidden"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        {recording ? (
+          <RecorderControl
+            kind="audio"
+            maxSeconds={AUDIO_MAX_SECONDS}
+            onRecorded={(f, duration) => {
+              setFile(f)
+              setRecordedDuration(duration)
+              setRecording(false)
+            }}
+            onCancel={() => setRecording(false)}
           />
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-medium text-ink-soft hover:border-brand-400"
-          >
-            <Upload size={13} /> {file ? file.name : 'Choose audio file (≤2 min)'}
-          </button>
-          <button
-            onClick={submit}
-            disabled={busy}
-            className="rounded-full bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50"
-          >
-            {busy ? 'Uploading…' : 'Upload testimonial'}
-          </button>
-        </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2.5">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="audio/*"
+              className="hidden"
+              onChange={(e) => {
+                setFile(e.target.files?.[0] ?? null)
+                setRecordedDuration(null)
+              }}
+            />
+            <button
+              onClick={() => setRecording(true)}
+              className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-medium text-ink-soft hover:border-brand-400"
+            >
+              <Mic size={13} /> Record now (≤2 min)
+            </button>
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex items-center gap-1.5 rounded-full border border-line bg-white px-3.5 py-2 text-xs font-medium text-ink-soft hover:border-brand-400"
+            >
+              <Upload size={13} /> {file ? file.name : 'Choose audio file'}
+            </button>
+            <button
+              onClick={submit}
+              disabled={busy}
+              className="rounded-full bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50"
+            >
+              {busy ? 'Uploading…' : 'Upload testimonial'}
+            </button>
+          </div>
+        )}
         {error && <p className="text-xs text-red-600">{error}</p>}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { RankByJDModal } from '../components/match/RankByJDModal'
 import { CandidateRow } from '../components/openings/CandidateRow'
 import { ReviewersPanel, SharePanel } from '../components/openings/SharePanels'
+import { VideoRequestsPanel } from '../components/openings/VideoRequestsPanel'
 import { useOpeningDetail } from '../hooks/useOpeningData'
 import { fmtDate } from '../lib/dates'
 import {
@@ -177,6 +178,12 @@ export default function OpeningDetail() {
               </ol>
             </div>
           )}
+          <VideoRequestsPanel
+            openingId={opening.id}
+            entries={entries}
+            profiles={profiles}
+            jobDescriptionId={saved?.jd.id ?? null}
+          />
           <SharePanel opening={opening} shares={shares} onChanged={reload} />
           <ReviewersPanel opening={opening} reviewers={reviewers} managers={managers} onChanged={reload} />
         </aside>

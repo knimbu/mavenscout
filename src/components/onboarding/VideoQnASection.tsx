@@ -1,8 +1,9 @@
-import { Film, Link2, Trash2, Upload } from 'lucide-react'
+import { Camera, Film, Link2, Trash2, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { uploadVideoFile } from '../../lib/media'
+import { uploadVideoFile, VIDEO_MAX_SECONDS } from '../../lib/media'
 import { supabase } from '../../lib/supabase'
 import type { InterviewQuestion, PortfolioItem, Profile, VideoResponse } from '../../types/db'
+import { RecorderControl } from '../media/Recorder'
 import { VideoPlayer } from '../media/VideoPlayer'
 
 // Video Q&As editor (PRD 7.5): general intro (both tiers, public teaser),
@@ -40,14 +41,19 @@ export function VideoQnASection({
 
   const addVideo = async (
     kind: VideoResponse['kind'],
-    source: { file?: File; url?: string },
+    source: { file?: File; url?: string; recordedDuration?: number },
     refs: { question_id?: string; portfolio_item_id?: string } = {},
   ) => {
     let video_path: string | null = null
     let video_url: string | null = null
     let duration_seconds = 0
     if (source.file) {
-      const up = await uploadVideoFile(profile.id, source.file)
+      const up = await uploadVideoFile(
+        profile.id,
+        source.file,
+        VIDEO_MAX_SECONDS,
+        source.recordedDuration,
+      )
       video_path = up.path
       duration_seconds = up.duration
     } else if (source.url) {
@@ -227,27 +233,42 @@ function ExistingVideo({
 export function UploadOrUrlVideo({
   label,
   onSubmit,
+  maxSeconds = VIDEO_MAX_SECONDS,
 }: {
   label: string
-  onSubmit: (source: { file?: File; url?: string }) => Promise<void>
+  onSubmit: (source: { file?: File; url?: string; recordedDuration?: number }) => Promise<void>
+  maxSeconds?: number
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [url, setUrl] = useState('')
+  const [recording, setRecording] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const capLabel = `${Math.round(maxSeconds / 60)} min`
 
-  const run = async (source: { file?: File; url?: string }) => {
+  const run = async (source: { file?: File; url?: string; recordedDuration?: number }) => {
     setBusy(true)
     setError(null)
     try {
       await onSubmit(source)
       setUrl('')
+      setRecording(false)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
       setBusy(false)
     }
   }
+
+  if (recording)
+    return (
+      <RecorderControl
+        kind="video"
+        maxSeconds={maxSeconds}
+        onRecorded={(file, duration) => run({ file, recordedDuration: duration })}
+        onCancel={() => setRecording(false)}
+      />
+    )
 
   return (
     <div>
@@ -265,10 +286,17 @@ export function UploadOrUrlVideo({
         />
         <button
           disabled={busy}
-          onClick={() => fileRef.current?.click()}
+          onClick={() => setRecording(true)}
           className="flex items-center justify-center gap-1.5 rounded-full bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50"
         >
-          <Upload size={13} /> {busy ? 'Working…' : `${label} — upload (≤2 min)`}
+          <Camera size={13} /> {label} — record
+        </button>
+        <button
+          disabled={busy}
+          onClick={() => fileRef.current?.click()}
+          className="flex items-center justify-center gap-1.5 rounded-full border border-brand-500 px-4 py-2 text-xs font-medium text-brand-700 hover:bg-brand-50 disabled:opacity-50"
+        >
+          <Upload size={13} /> {busy ? 'Working…' : `Upload (≤${capLabel})`}
         </button>
         <div className="flex flex-1 gap-2">
           <input
@@ -288,8 +316,8 @@ export function UploadOrUrlVideo({
         </div>
       </div>
       <p className="mt-1 flex items-center gap-1 text-[11px] text-ink-faint">
-        <Film size={11} /> Uploads are duration-checked before saving; the 2-minute cap can't be
-        verified for pasted links.
+        <Film size={11} /> Recording stops automatically at {capLabel}; uploads are
+        duration-checked before saving; caps can't be verified for pasted links.
       </p>
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>

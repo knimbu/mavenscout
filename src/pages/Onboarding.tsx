@@ -12,6 +12,7 @@ import { TagPicker } from '../components/onboarding/TagPicker'
 import { TestimonialsSection } from '../components/onboarding/TestimonialsSection'
 import { TierSection } from '../components/onboarding/TierSection'
 import { VideoQnASection } from '../components/onboarding/VideoQnASection'
+import { VideoRequestsInbox } from '../components/onboarding/VideoRequestsInbox'
 import { InfoTip } from '../components/ui/InfoTip'
 import { FIRM_THRESHOLD_NOTE } from '../components/ui/badges'
 import { useEditorProfile } from '../hooks/useEditorProfile'
@@ -148,7 +149,12 @@ export default function Onboarding() {
         )}
       </div>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[200px,1fr]">
+      {/* Async video requests from hiring orgs surface here (7.17 — email stubbed). */}
+      <div className="mt-6">
+        <VideoRequestsInbox profile={draft} />
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[200px,1fr]">
         {/* Section nav: sticky rail on desktop, scrolling chips on mobile */}
         <nav className="top-20 flex gap-2 overflow-x-auto lg:sticky lg:h-fit lg:flex-col lg:gap-0.5">
           {SECTIONS.map(([id, label]) => (

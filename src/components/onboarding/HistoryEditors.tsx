@@ -5,6 +5,7 @@ import type {
   WorkHistoryEntry,
 } from '../../types/db'
 import { FieldRow, ListItemCard, TextArea, TextField } from './fields'
+import { LogoLookup } from './LogoLookup'
 
 // The three Experience-tab history editors (PRD 7.2/7.3): Work History (≤10,
 // with manual logo URL — Brandfetch autocomplete is a P1 fast-follow, 7.11),
@@ -76,13 +77,21 @@ export function WorkHistoryEditor({
             onStart={(v) => update(i, { start_year: v || 0 })}
             onEnd={(v) => update(i, { end_year: v === '' ? null : v })}
           />
-          <TextField
-            label="Logo URL (optional)"
-            value={entry.logo_url ?? ''}
-            onChange={(v) => update(i, { logo_url: v || null })}
-            placeholder="https://…/logo.png"
-            hint="Paste an image URL — shown in Work History and as a card-front Sector Experience chip"
-          />
+          <div>
+            <TextField
+              label="Logo URL (optional)"
+              value={entry.logo_url ?? ''}
+              onChange={(v) => update(i, { logo_url: v || null })}
+              placeholder="https://…/logo.png"
+              hint="Paste an image URL — shown in Work History and as a card-front Sector Experience chip"
+            />
+            <div className="mt-1">
+              <LogoLookup
+                organization={entry.organization}
+                onPick={(url) => update(i, { logo_url: url })}
+              />
+            </div>
+          </div>
           <TextArea
             label="Description (optional)"
             rows={2}

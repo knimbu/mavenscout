@@ -70,13 +70,17 @@ export function getMediaDuration(file: File, kind: 'video' | 'audio'): Promise<n
 }
 
 /** Duration-checks then uploads a video file to the 'videos' bucket.
- *  Returns {path, duration}. Throws a user-facing message on rejection. */
+ *  Returns {path, duration}. Throws a user-facing message on rejection.
+ *  `knownDurationSeconds`: pass for in-browser recordings — the cap was
+ *  enforced live during capture, and MediaRecorder webm blobs often report
+ *  Infinity in their metadata, so the metadata check is skipped. */
 export async function uploadVideoFile(
   profileId: string,
   file: File,
   maxSeconds: number = VIDEO_MAX_SECONDS,
+  knownDurationSeconds?: number,
 ): Promise<{ path: string; duration: number }> {
-  const duration = await getMediaDuration(file, 'video')
+  const duration = knownDurationSeconds ?? (await getMediaDuration(file, 'video'))
   if (duration > maxSeconds)
     throw new Error(
       `Videos are capped at ${maxSeconds / 60} minutes — this one is ${Math.round(duration)}s.`,
@@ -88,12 +92,14 @@ export async function uploadVideoFile(
   return { path, duration: Math.round(duration) }
 }
 
-/** Duration-checks then uploads testimonial audio to its bucket. */
+/** Duration-checks then uploads testimonial audio to its bucket.
+ *  `knownDurationSeconds`: see uploadVideoFile — for in-browser recordings. */
 export async function uploadAudioFile(
   profileId: string,
   file: File,
+  knownDurationSeconds?: number,
 ): Promise<{ path: string; duration: number }> {
-  const duration = await getMediaDuration(file, 'audio')
+  const duration = knownDurationSeconds ?? (await getMediaDuration(file, 'audio'))
   if (duration > AUDIO_MAX_SECONDS)
     throw new Error(
       `Audio testimonials are capped at 2 minutes — this one is ${Math.round(duration)}s.`,
