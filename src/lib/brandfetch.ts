@@ -22,6 +22,16 @@ export function brandfetchClientId(): string | null {
   )
 }
 
+/** The durable Logo Link for a domain — this is what gets STORED in logo_url.
+ *  (The Search API's own `icon` URLs carry short-lived tokens and expire.)
+ *  Note: Brandfetch's CDN refuses hotlinks from localhost referers, so these
+ *  render as broken in local dev and work on any real deployed domain —
+ *  the OrgLogo component's monogram fallback covers the dev case. */
+export function logoLinkUrl(domain: string): string | null {
+  const clientId = brandfetchClientId()
+  return clientId ? `https://cdn.brandfetch.io/${domain}?c=${clientId}` : null
+}
+
 export async function searchBrands(name: string): Promise<BrandMatch[]> {
   const clientId = brandfetchClientId()
   if (!clientId || name.trim().length < 2) return []

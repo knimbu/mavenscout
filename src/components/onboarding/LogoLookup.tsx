@@ -1,6 +1,6 @@
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { brandfetchClientId, searchBrands, type BrandMatch } from '../../lib/brandfetch'
+import { brandfetchClientId, logoLinkUrl, searchBrands, type BrandMatch } from '../../lib/brandfetch'
 
 /** Brandfetch logo autocomplete (PRD 7.11 — P1): search by the org name the
  *  consultant already typed, confirm a match, write its CDN icon URL into
@@ -52,12 +52,13 @@ export function LogoLookup({
               key={m.domain}
               type="button"
               onClick={() => {
-                if (m.icon) onPick(m.icon)
+                // Store the durable Logo Link (search icons carry expiring tokens).
+                const durable = logoLinkUrl(m.domain)
+                if (durable) onPick(durable)
                 setMatches(null)
               }}
-              disabled={!m.icon}
               title={m.domain}
-              className="flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-xs text-ink-soft hover:border-brand-400 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-1 text-xs text-ink-soft hover:border-brand-400"
             >
               {m.icon && <img src={m.icon} alt="" className="h-4 w-4 rounded-sm object-contain" />}
               {m.name} <span className="text-ink-faint">{m.domain}</span>

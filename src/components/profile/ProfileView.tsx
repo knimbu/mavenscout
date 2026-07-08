@@ -18,6 +18,7 @@ import {
 } from '../ui/badges'
 import { Carousel } from '../ui/Carousel'
 import { GatePrompt } from '../ui/GatePrompt'
+import { OrgLogo } from '../ui/OrgLogo'
 import { TagPills } from '../ui/TagPills'
 import { ContactModal } from './ContactModal'
 
@@ -385,17 +386,12 @@ function TimelineEntry({
 }) {
   return (
     <li className="flex gap-3.5">
-      {logo ? (
-        <img src={logo} alt="" className="mt-0.5 h-9 w-9 shrink-0 rounded-lg border border-line object-contain" />
-      ) : (
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700">
-          {subtitle
-            .split(/\s+/)
-            .slice(0, 2)
-            .map((w) => w[0]?.toUpperCase())
-            .join('')}
-        </span>
-      )}
+      <OrgLogo
+        url={logo}
+        name={subtitle}
+        className="mt-0.5 h-9 w-9 rounded-lg"
+        monogramClassName="bg-brand-100 text-xs font-bold text-brand-700"
+      />
       <div className="min-w-0">
         <p className="text-sm font-semibold">{title}</p>
         <p className="text-sm text-ink-soft">{subtitle}</p>

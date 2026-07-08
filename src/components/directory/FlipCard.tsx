@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { resolveVideo } from '../../lib/media'
 import type { PortfolioItem, Profile, VideoResponse } from '../../types/db'
+import { OrgLogo } from '../ui/OrgLogo'
 import { TagPills } from '../ui/TagPills'
 import {
   AvailabilityBadges,
@@ -181,13 +182,7 @@ export function FlipCard({
                             className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-line bg-paper px-2 py-1 text-xs text-ink-soft"
                             title={`${org.role}, ${org.organization}`}
                           >
-                            {org.logo_url ? (
-                              <img src={org.logo_url} alt="" className="h-4 w-4 rounded-sm object-contain" />
-                            ) : (
-                              <span className="flex h-4 w-4 items-center justify-center rounded-sm bg-brand-100 text-[9px] font-bold text-brand-700">
-                                {monogram(org.organization)}
-                              </span>
-                            )}
+                            <OrgLogo url={org.logo_url} name={org.organization} />
                             <span className="truncate">{org.organization}</span>
                           </span>
                         ))}
