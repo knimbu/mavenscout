@@ -34,7 +34,7 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
+        display: ['"Schibsted Grotesk"', 'system-ui', 'sans-serif'],
         sans: ['"Public Sans"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
